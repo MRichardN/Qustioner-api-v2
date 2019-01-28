@@ -23,7 +23,7 @@ class TestComments(BaseTest):
 
         self.comment1 = {
             'body': 'Why cant we use an ORM like SQLAlchemy',
-            'question_id': 1
+            'question_id': 1,
         }
 
         self.comment2 = {
@@ -36,34 +36,55 @@ class TestComments(BaseTest):
     def tearDown(self):
         super().tearDown()
 
+<<<<<<< HEAD
 ###########failed not found
     def test_post_comment(self):
         """ Test post a comment."""
         
         res = self.client.post('/api/v2/comment/', json=self.comment1, headers=self.headers)
+=======
+    def test_post_comment(self):
+        """ Test post a comment."""
+        res = self.client.post('/api/v2/question/1/comments/',json=self.comment1, headers=self.headers)
+>>>>>>> 3d5bb255d63bf2cd9f014ada570d278871c9fa91
         data = res.get_json()
 
         self.assertEqual(res.status_code, 201)
         self.assertEqual(data['status'], 201)
         self.assertEqual(data['message'], 'Comment posted')
+<<<<<<< HEAD
 '''
     ###########failed not found
     def test_post_comment_for__no_data_sent(self):
         """ Test post comment with no data sent."""
 
         res = self.client.post('/api/v2/question/<int:question_id>/comments/', headers=self.headers)
+=======
+
+    def test_post_comment_for__no_data_sent(self):
+        """ Test post comment with no data sent."""
+
+        res = self.client.post('/api/v2/question/1/comments/', headers=self.headers)
+>>>>>>> 3d5bb255d63bf2cd9f014ada570d278871c9fa91
         data = res.get_json()
 
         self.assertEqual(res.status_code, 400)
         self.assertEqual(data['status'], 400)
         self.assertEqual(data['message'], 'No data provided')    
 
+<<<<<<< HEAD
     ###########failed not found url check
     def test_post_comment_for_nonexistent__question(self):
         """ Test post comment for non existent question."""
 
         
         res = self.client.post('/api/v2/question/8/comments/', headers=self.headers)
+=======
+    def test_post_comment_for_nonexistent__question(self):
+        """ Test post comment for non existent question."""
+
+        res = self.client.post('/api/v2/question/55/comments/',headers=self.headers)
+>>>>>>> 3d5bb255d63bf2cd9f014ada570d278871c9fa91
         data = res.get_json()
 
         self.assertEqual(res.status_code, 404)
@@ -84,7 +105,11 @@ class TestComments(BaseTest):
         self.assertEqual(data['message'], 'No data provided')
 
    
+<<<<<<< HEAD
 ###########failed not found
+=======
+
+>>>>>>> 3d5bb255d63bf2cd9f014ada570d278871c9fa91
     def test_getAll_comments_question_not_posted(self):
         """ Test get all comments for question not found."""
 
@@ -97,7 +122,12 @@ class TestComments(BaseTest):
 
     def test_getAll_comments(self):
         """ Test get all comments for a specific question."""
+<<<<<<< HEAD
         self.client.post('/api/v2/question/comments/', json=self.comment1,
+=======
+        
+        self.client.post('/api/v2/question/1/comments/', json=self.comment1,
+>>>>>>> 3d5bb255d63bf2cd9f014ada570d278871c9fa91
                          headers=self.headers)
         self.client.post('/api/v2/question/1/comments/', json=self.comment2,
                          headers=self.headers)
@@ -109,12 +139,21 @@ class TestComments(BaseTest):
         self.assertEqual(data['status'], 200)
         self.assertEqual(len(data['data']), 2)
 
+<<<<<<< HEAD
     ###########failed not found
     def test_getAll_comments_for_question_without_comment(self):
+=======
+    def test_getAll_comments_for_question_without(self):
+        """ Test get all comments for a question not commented on."""
+        
+>>>>>>> 3d5bb255d63bf2cd9f014ada570d278871c9fa91
         res = self.client.get('/api/v2/question/1/comments/')
         data = res.get_json()
 
         self.assertEqual(res.status_code, 200)
         self.assertEqual(data['status'], 200)
         self.assertEqual(len(data['data']), 0)
+<<<<<<< HEAD
 '''
+=======
+>>>>>>> 3d5bb255d63bf2cd9f014ada570d278871c9fa91

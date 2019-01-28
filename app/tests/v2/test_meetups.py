@@ -29,13 +29,22 @@ class TestMeetup(BaseTest):
             'description': 'Insering data with INSERT statement',
             'location': 'PAC',
             'happeningOn': '28/01/2019',
-            'tags': ['python', 'databases']
+            'tags': ['python','databases']
         }
 
     def tearDown(self):
         super().tearDown()
 
-  
+    def test_create_meetup__with_no_data(self):
+        """ Test create meetup with no data sent."""
+
+        res = self.client.post('/api/v2/meetup/', headers=self.headers)
+        data = res.get_json()
+
+        self.assertEqual(res.status_code, 400)
+        self.assertEqual(data['status'], 400)
+        self.assertEqual(data['error'], 'Failed: No data provided')
+
     def test_create_meetup_with_empty_data(self):
         """ Test create meetup with no data sent."""
 
@@ -47,7 +56,11 @@ class TestMeetup(BaseTest):
 
         self.assertEqual(res.status_code, 400)
         self.assertEqual(data['status'], 400)
+<<<<<<< HEAD
         self.assertEqual(data['message'], 'No data provided')
+=======
+        self.assertEqual(data['error'], 'Failed: No data provided')
+>>>>>>> 3d5bb255d63bf2cd9f014ada570d278871c9fa91
 
     def test_create_meetup_with_missing_fields(self):
         """ Test create meetup with missing fields in request """

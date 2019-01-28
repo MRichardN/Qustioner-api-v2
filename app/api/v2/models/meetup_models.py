@@ -8,25 +8,40 @@ class MeetupModel(BaseModel):
     table = 'meetups'
 
     def save(self, data):
+<<<<<<< HEAD
         """ save a new meetup."""
+=======
+        """ save a meetup."""
+>>>>>>> 3d5bb255d63bf2cd9f014ada570d278871c9fa91
         tags = '{'
         
         for tag in data['tags']:
             tags += '"'+ tag +'",'
         tags = tags[:-1] + '}'
 
+<<<<<<< HEAD
         query = "INSERT INTO {} (topic, description, tags, location, happeningOn) \
         VALUES ('{}','{}','{}','{}','{}') RETURNING *".format(self.table, data['topic'], data['description'], tags, data['location'], data['happeningOn']) 
+=======
+        query = "INSERT INTO {} (topic, description, tags, location, happeningOn)  \
+        VALUES('{}','{}','{}','{}','{}')RETURNING *".format(self.table, data['topic'], data['description'], tags, data['location'], data['happeningOn']) 
+>>>>>>> 3d5bb255d63bf2cd9f014ada570d278871c9fa91
         self.cur.execute(query)
         result = self.cur.fetchone()
         self.conn.commit()
         return result
 
     def exists(self, key, value):
+<<<<<<< HEAD
         """ search item by key value pair."""
         query = "SELECT * FROM {} WHERE {} = '{}'".format(self.table, key, value)
         self.cur.execute(query)
         result = self.cur.fetchall()
+=======
+        query = "SELECT * FROM {} WHERE {} = '{}'".format(self.table, key, value)
+        self.cur.execute(query)
+        result = self.cur.fetchone()
+>>>>>>> 3d5bb255d63bf2cd9f014ada570d278871c9fa91
         return len(result) > 0
 
 
@@ -38,8 +53,13 @@ class MeetupModel(BaseModel):
     def getAll(self):
         query = "SELECT * FROM {}".format(self.table)
         self.cur.execute(query)
+<<<<<<< HEAD
         result = self.cur.fetchall()
         return result
+=======
+        return self.cur.fetchall()
+         
+>>>>>>> 3d5bb255d63bf2cd9f014ada570d278871c9fa91
 
     def where(self, key, value):
         query = "SELECT * FROM {} WHERE {} = '{}'".format(self.table, key, value)
@@ -74,7 +94,11 @@ class MeetupModel(BaseModel):
 
     def usersAttending(self, meetup_id):
         """ Get users attending an upcoming meetup."""
+<<<<<<< HEAD
         query = "SELECT id, firstname, lastname, email FROM users WHERE \
+=======
+        query = "SELECT id, username FROM users WHERE\
+>>>>>>> 3d5bb255d63bf2cd9f014ada570d278871c9fa91
         id IN ( SELECT user_id FROM rsvps WHERE meetup_id = '{}' AND response = 'yes')".format(meetup_id)
 
         self.cur.execute(query)
@@ -88,8 +112,12 @@ class MeetupModel(BaseModel):
         endWeek = (datetime.now() + timedelta(days=7)).strftime('%d/%m/%Y')
         query = "SELECT * FROM {} WHERE happeningOn BETWEEN '{}' AND '{}'".format(self.table, today, endWeek)
         self.cur.execute(query)
+<<<<<<< HEAD
         result = self.cur.fetchall()
         return result
+=======
+        return self.cur.fetchall()
+>>>>>>> 3d5bb255d63bf2cd9f014ada570d278871c9fa91
 
     def check_if_duplicate(self, data):
         """ Check for duplicate meetups."""
@@ -108,7 +136,12 @@ class MeetupModel(BaseModel):
         result = self.cur.fetchone()
 
         if result:
+<<<<<<< HEAD
             return True, 'Meetup happening the same date at the same venue already exists'
+=======
+            return True, 'Meetup happening the same date at the same venue \
+            already exists'
+>>>>>>> 3d5bb255d63bf2cd9f014ada570d278871c9fa91
 
         query = "SELECT * FROM {} WHERE topic = '{}' AND happeningOn = '{}'\
         ".format(self.table, data['topic'], data['happeningOn'])

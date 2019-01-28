@@ -46,6 +46,7 @@ def post_meetups():
         else:
             try:    
                 # Check if request is valid
+<<<<<<< HEAD
                 data = MeetupSchema().load(meetup_data)
                 duplicate, message = MeetupModel().check_if_duplicate(data)
 
@@ -56,12 +57,28 @@ def post_meetups():
                     new_meetup = MeetupModel().save(data)
                     result = MeetupSchema().dump(new_meetup) 
                     return jsonify({'status': 201, 'message': 'Meetup created', 'data': result}), 201   
+=======
+                 data = MeetupSchema().load(meetup_data)
+                 duplicate, message = MeetupModel().check_if_duplicate(data)
+
+                 if duplicate:
+                     abort(make_response(jsonify({'status':403, 'message':message}), 403))
+
+                 else:
+                     new_meetup = MeetupModel().save(data)
+                     result = MeetupSchema().dump(new_meetup) 
+                     return jsonify({'status': 201, 'message': 'Meetup created', 'data': result}), 201   
+>>>>>>> 3d5bb255d63bf2cd9f014ada570d278871c9fa91
         
             # display errors alongside valid data entered
             except ValidationError as errors:
                 errors.messages
                 valid_data = errors.valid_data
+<<<<<<< HEAD
                 abort(make_response(jsonify({'status': 400, 'message' : 'Invalid data', 'errors': errors.messages, 'valid_data':valid_data}), 400))    
+=======
+                abort(make_response(jsonify({'status': 400, 'error' : 'Invalid data', 'errors': errors.messages, 'valid_data':valid_data}), 400))    
+>>>>>>> 3d5bb255d63bf2cd9f014ada570d278871c9fa91
 
     
  
@@ -88,10 +105,16 @@ def get_a_specific_meetup(meetup_id):
 def rspvs_meetup(meetup_id, rsvps):
     """ rsvp meetup."""
 
+<<<<<<< HEAD
     response = ('yes', 'no', 'maybe')
 
     current_user = get_jwt_identity()
         
+=======
+    current_user = get_jwt_identity()
+    response = ['yes', 'no', 'maybe']
+
+>>>>>>> 3d5bb255d63bf2cd9f014ada570d278871c9fa91
     # Check if meetup exists
     if not MeetupModel().exists('id', meetup_id):
         abort(make_response(jsonify({'status': 404, 'message': 'Meetup does not exist'}), 404))
@@ -100,6 +123,7 @@ def rspvs_meetup(meetup_id, rsvps):
     elif rsvps not in response:
         abort(make_response(jsonify({'status': 400, 'message': 'Invalid rsvp'}), 400))
 
+<<<<<<< HEAD
     elif RsvpModel().exists(meetup_id, current_user):
         abort(make_response(jsonify({'status': 403, 'message': 'Already responded'}), 403))
 
@@ -109,6 +133,19 @@ def rspvs_meetup(meetup_id, rsvps):
         result = RsvpSchema().dump(resp) 
         return jsonify({'status': 200, 'message':'Responded successfully', 'data': result}), 200
     
+=======
+    elif MeetupModel().exists(meetup_id, current_user):
+         abort(make_response(jsonify({'status': 403, 'message': 'Already responded'}), 403))
+
+    else:
+        data = {'meetup_id':meetup_id, 'user_id': current_user, 'response':rsvps}
+        res = MeetupModel().save(data)
+        result = RsvpSchema().dump(res) 
+        return jsonify({'status': 200, 'data': result }), 200
+    
+
+
+>>>>>>> 3d5bb255d63bf2cd9f014ada570d278871c9fa91
 @version2.route('/meetup/<int:meetup_id>/', methods=['DELETE'])
 @jwt_required
 def delete_meetup(meetup_id):
@@ -128,21 +165,36 @@ def delete_meetup(meetup_id):
             return jsonify({'status':200, 'message':'Meetup Deleted'}), 200   
 
            
+<<<<<<< HEAD
 @version2.route('/meetups/<int:meetup_id>/attendees/', methods=['GET'])
 def get_attendees(meetup_id):
     """ Get meetup attendees."""
 
     if not MeetupModel().exists('id', meetup_id):
+=======
+@version2.route('/meetups/<int:meetup_id>/attendees/', methods = ['GET'])
+def get_attendees(meetup_id):
+    """ Get meetup attendees."""
+
+    if not MeetupModel().exists(id, meetup_id):
+>>>>>>> 3d5bb255d63bf2cd9f014ada570d278871c9fa91
         abort(make_response(jsonify({'status': 404, 'message':'Meetup not found'}), 404))
 
     else:
         users = MeetupModel().usersAttending(meetup_id)
         result = UserSchema(many=True).dump(users)
+<<<<<<< HEAD
         return jsonify({'status': 200, 'users': result, 'attendees': len(users)}), 200
     
 
 @version2.route('/meetups/<int:meetup_id>/tags/', methods=['PATCH'])
 @jwt_required
+=======
+        return jsonify({'status': 200, 'data': result, 'attendees': len(users) })
+    
+@jwt_required
+@version2.route('/meetups/<int:meetup_id>/tags/', methods = ['PATCH'])
+>>>>>>> 3d5bb255d63bf2cd9f014ada570d278871c9fa91
 def update_meetup_tags(meetup_id):
     """ update meetup tags."""
 

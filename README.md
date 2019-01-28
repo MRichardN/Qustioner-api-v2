@@ -7,7 +7,7 @@ A questioner is a platform for crowd-sourcing questions for a meetup. It helps t
 
 ## Prerequisites
 - Python 3.7.0 
-- Postman
+- Postman or Insomnia
 
 
 ## Installation

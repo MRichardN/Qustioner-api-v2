@@ -6,10 +6,17 @@ class QuestionModel(BaseModel):
     table = 'questions'
 
     
+<<<<<<< HEAD
     def save(self, data):
         """ Save a new question."""
         query = "INSERT INTO {} (title, body, meetup_id, user_id) \
         VALUES('{}','{}','{}', '{}') RETURNING *".format(self.table, data['title'], data['body'], data['meetup_id'], data['user_id'])
+=======
+    def save(self, question):
+        """ Save a new question."""
+        query = "INSERT INTO {} (title, body, meetup_id, user_id) \
+        VALUES('{}','{}','{}', '{}')RETURNING *".format(self.table, question['title'], question['body'], question['meetup_id'], question['user_id'])
+>>>>>>> 3d5bb255d63bf2cd9f014ada570d278871c9fa91
         self.cur.execute(query)
         result = self.cur.fetchone()
         self.conn.commit()
@@ -31,7 +38,11 @@ class QuestionModel(BaseModel):
         query = "UPDATE {} SET votes = '{}' WHERE id = '{}' RETURNING *".format(self.table, votes, question_id)
         self.cur.execute(query)
         self.conn.commit()
+<<<<<<< HEAD
         return self.cur.fetchone()
+=======
+        return self.cur.fetchhone()
+>>>>>>> 3d5bb255d63bf2cd9f014ada570d278871c9fa91
     
     def exist(self, key, value):
         """ check whether it exists."""
@@ -44,8 +55,12 @@ class QuestionModel(BaseModel):
     def where(self, key, value):
         query = "SELECT * FROM {} WHERE {} = '{}'".format(self.table, key, value)
         self.cur.execute(query) 
+<<<<<<< HEAD
         result = self.cur.fetchone()
         return result
+=======
+        return self.cur.fetchone()
+>>>>>>> 3d5bb255d63bf2cd9f014ada570d278871c9fa91
 
     
     def getOne(self, id):
