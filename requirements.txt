@@ -21,6 +21,8 @@ marshmallow==3.0.0rc2
 mccabe==0.6.1
 more-itertools==5.0.0
 pluggy==0.8.0
+psycopg2==2.7.6.1
+psycopg2-binary==2.7.6.1
 py==1.7.0
 PyJWT==1.7.1
 pylint==2.2.2
@@ -31,4 +33,4 @@ six==1.12.0
 urllib3==1.24.1
 Werkzeug==0.14.1
 wrapt==1.10.11
-WTForms==2.2.1
+

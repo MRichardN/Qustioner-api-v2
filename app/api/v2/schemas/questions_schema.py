@@ -1,15 +1,14 @@
 from marshmallow import Schema, fields
-from ..utils.validate import required
+#from ..util.validate import required
+from app.api.v2.util.validate import required
 
 class QuestionSchema(Schema):
-    """ This question represents question schema """
+    """ Schema for Questions """
 
     id = fields.Int(dump_only=True)
-    createdOn = fields.DateTime(dump_only=True)
-    createdBy = fields.Int(required=True)
-    meetup = fields.Int(required=True)
     title = fields.Str(required=False, validate=(required))
     body = fields.Str(required=True, validate=(required))
+    meetup_id = fields.Int(required=True)
+    user_id = fields.Int(dump_only=True)
     votes = fields.Int(dump_only=True)
-    
-    
+    createdOn = fields.DateTime(dump_only=True)

@@ -1,52 +1,71 @@
-class Questions():
+from .base_model import BaseModel
     
+class QuestionModel(BaseModel):
+    """ Question Model."""
     
+    table = 'questions'
 
     
-    def add_question(self, title, description, time_created,userid, cursor):
-        "add question to the database in user table"
-        query="""INSERT INTO questions(title,description,time_created,userid) VALUES(%s,%s,%s,%s)
-        """
-        cursor.execute(query,(title,description,time_created, userid))
-        return cursor
+    def save(self, data):
+        """ Save a new question."""
+        query = "INSERT INTO {} (title, body, meetup_id, user_id) \
+        VALUES('{}','{}','{}', '{}') RETURNING *".format(self.table, data['title'], data['body'], data['meetup_id'], data['user_id'])
+        self.cur.execute(query)
+        result = self.cur.fetchone()
+        self.conn.commit()
+        return result
 
-    def update_question(self, title, description, questionid, cursor):
-        "update question details in the database"
-        query="UPDATE questions SET title=%s, description=%s WHERE questionid=%s;"
-        cursor.execute(query,(title,description,questionid))
-        return cursor
+    def upvote(self, question_id):
+        """ Upvote a question."""
+        question = self.where('id', question_id)
+        votes = question['votes'] + 1
+        query = "UPDATE {} SET votes = '{}' WHERE id = '{}' RETURNING *".format(self.table, votes, question_id)
+        self.cur.execute(query)
+        self.conn.commit()
+        return self.cur.fetchone()
 
-    def delete_question(self,questionid,cursor):
-        "delete question by id"
-        query="DELETE FROM questions WHERE questions.questionid = %s"
-        cursor.execute(query,(questionid,))
-        return cursor
+    def downvote(self, question_id):
+        """ Downvote a question."""
+        question = self.where('id', question_id)
+        votes = question['votes'] - 1
+        query = "UPDATE {} SET votes = '{}' WHERE id = '{}' RETURNING *".format(self.table, votes, question_id)
+        self.cur.execute(query)
+        self.conn.commit()
+        return self.cur.fetchone()
+    
+    def exist(self, key, value):
+        """ check whether it exists."""
+        query = "SELECT * FROM {} WHERE {} = '{}'".format(self.table, key, value)
+        self.cur.execute(query)
+        result = self.cur.fetchall()
+        return len(result) > 0
 
-    def search_question_by_title(self,title,cursor):
-        "search question by title"
-        query="SELECT * FROM questions WHERE title Like %s"
-        cursor.execute(query,(title,))
-        return cursor
 
-    def search_question_by_questionid(self,questionid,cursor):
-        "search question by id"
-        query="SELECT * FROM questions WHERE questionid = %s"
-        cursor.execute(query,(questionid,))
-        return cursor
+    def where(self, key, value):
+        query = "SELECT * FROM {} WHERE {} = '{}'".format(self.table, key, value)
+        self.cur.execute(query) 
+        result = self.cur.fetchone()
+        return result
 
-    def search_question_by_user(self,userid, cursor):
-        query="SELECT * FROM questions WHERE userid = %s"
-        cursor.execute(query,(userid,))
-        return cursor
+    
+    def getOne(self, id):
+        question = self.where('id', id)
+        return question
 
-    def fetch_all_question(self, cursor):
-        "fetchall questions"
-        query = "SELECT * FROM questions"
-        cursor.execute(query)
-        return cursor
+    def getAll(self, id):
+        """ get all questions for a meetup."""
+        query = "SELECT * FROM {} WHERE meetup_id = {}".format(self.table, id)
+        self.cur.execute(query)
+        result = self.cur.fetchall()   
+        return result 
 
-    def clear_question_table(self,connection):
-        "clear user table"
-        query ="""DROP TABLE questions CASCADE"""
-        cursor = connection.cursor()
-        cursor.execute(query)    
+    def delete(self, id):
+        """ delete a question."""
+        query = "DELETE FROM {} WHERE question_id = {}".format(self.table, id)
+        self.cur.execute(query)
+        self.conn.commit()
+        return True
+        
+
+
+

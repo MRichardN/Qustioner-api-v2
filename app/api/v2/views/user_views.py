@@ -1,5 +1,4 @@
-
-# Third party import
+0# Third party import
 from flask import jsonify, request, abort, make_response
 from marshmallow import ValidationError
 from flask_jwt_extended import (create_access_token, create_refresh_token, jwt_required,
@@ -7,93 +6,102 @@ from flask_jwt_extended import (create_access_token, create_refresh_token, jwt_r
 
 # local import
 from app.api.v2 import version2
+from ..models.user_models import UserModel
 from ..models.token_model import RevokedTokenModel
-from ..dbschemas.users_schema import UserSchema
-from ..models.users_model import User
-
-usr = User()
+from ..schemas.user_schemas import UserSchema
 
 
-@version2.route('/register/', methods=['POST'])
+
+@version2.route('/auth/register/', methods=['POST'])
 def register_user():
     """ Register user endpoint."""
-    data = request.get_json()
+    reg_data = request.get_json()
 
     
     # Empty entry
-    if not data:
+    if not reg_data:
         abort(make_response(jsonify({'status': 400, 'message': 'No data provided'}), 400))
-    try:
-            
-        # Check if request is valid
-        data = UserSchema().load(data)
+
+    else:                
+        try:            
+            # Check if request is valid
+            data = UserSchema().load(reg_data)
         
-        #display errors and valid data entered
-    except ValidationError as errors:
-        errors.messages
-        valid_data = errors.valid_data
-        abort(make_response(jsonify({'status': 400, 'message' : 'Invalid data. Please fill all required fields', 'errors': errors.messages, 'valid_data':valid_data}), 400))
-    
-    # Check if username exists
-    if next(filter(lambda u: u['username'] == data['username'], usr.getAll()), None):
-        abort(make_response(jsonify({'status': 409, 'message' : 'Username already exists'}), 409))
+            # Check if username exists
+            if UserModel().exists('username', data['username']):
+                abort(make_response(jsonify({'status': 409, 'message' : 'Username already exists'}), 409))
+            
+            # Check if email exists    
+            elif UserModel().exists('email', data['email']):
+                abort(make_response(jsonify({'status': 409, 'message' : 'Email already exists'}), 409))
 
-    # Check if email exists    
-    if usr.exists('email', data['email']):
-        abort(make_response(jsonify({'status': 409, 'message' : 'Email already exists'}), 409))
+            else:
+                # Save new user 
+                new_user = UserModel().save(data)
+                result = UserSchema(exclude=['password']).dump(new_user)
+                # Generate access and refresh tokens
+                access_token = create_access_token(identity=new_user['id'], fresh=True)
+                refresh_token = create_refresh_token(identity=new_user['id'])
+                return jsonify({
+                    'status': 201, 
+                    'message' : 'New user created', 
+                    'data': result, 
+                    'access_token' : access_token, 
+                    'refresh_token' : refresh_token
+                    }), 201
+            #display errors and valid data entered          
+        except ValidationError as error:
+            error.messages
+            valid_data = error.valid_data
+            abort(make_response(jsonify({'status': 400, 'message' : 'Invalid data', 'errors': error.messages, 'valid_data':valid_data}), 400))    
 
-    # Save new user and get result
-    new_user = usr.save(data)
-    result = UserSchema(exclude=['password']).dump(new_user)
-
-    # Generate access and refresh tokens and return response
-    access_token = create_access_token(identity=new_user['id'], fresh=True)
-    refresh_token = create_refresh_token(identity=new_user['id'])
-    return jsonify({
-        'status': 201, 
-        'message' : 'New user created ', 
-        'data': result, 
-        'access_token' : access_token, 
-        'refresh_token' : refresh_token
-        }), 201
-
-@version2.route('/login/', methods=['POST'])
+@version2.route('/auth/login/', methods=['POST'])
 def login():
     """ Login a registered user"""
-    data = request.get_json()
+    login_data = request.get_json()
 
     # Check for empty entries
-    if not data:
+    if not login_data:
         abort(make_response(jsonify({'status': 400, 'message': 'No data provided'}), 400))
 
-    # Check if credentials have been passed
+    else:
+        try:
+            # Check if credentials have been passed
+            data = UserSchema().load(login_data, partial=True)
+            
+            try:
+                username = data['username']
+                password = data['password']
 
-    try:
-        username = data['username']
-        password = data['password']
-    except:
-        abort(make_response(jsonify({'status': 400, 'message': 'Invalid credentials'}), 400))
+                if not UserModel().exists('username', username):
+                    abort(make_response(jsonify({'status': 404, 'message' : 'User not found'}), 404))
+
+                else:
+                    user = UserModel().where('username', username)
+
+                    # Check if password match
+                    if not UserModel().checkpwdhash(user['password'], password):
+                        abort(make_response(jsonify({'status': 422, 'message' : 'Invalid password'}), 422))
+
+                    else:
+                        # Generate user tokens 
+                        access_token = create_access_token(identity=user['id'])
+                        refresh_token = create_refresh_token(identity=True)
+                        return jsonify({
+                            'status': 200, 
+                            'message': 'User logged in successfully',
+                            'access_token': access_token,
+                            'refresh_token': refresh_token,
+                            'user_id': user['id']
+                            }), 200
+
+            except:
+                abort(make_response(jsonify({'status': 400, 'message': 'Invalid credentials'}), 400))
+
+        except ValidationError as error:
+            #errors = error.messages
+            abort(make_response(jsonify({'status': 400, 'message' : 'Invalid data', 'errors': error}), 400))        
     
-
-    # Check if username exists
-    if not usr.exists('username', username):
-        abort(make_response(jsonify({'status': 404, 'message' : 'User not found'}), 404))
-
-    user = usr.getOne('username', username)
-
-    # Check if password match
-    if not usr.checkpasswordhash(user['password'], password):
-        abort(make_response(jsonify({'status': 404, 'message' : 'Invalid password'}), 404))
-
-     # Generate user tokens 
-    access_token = create_access_token(identity=user['id'], fresh=True)
-    refresh_token = create_refresh_token(identity=True)
-    return jsonify({
-        'status': 200, 
-        'message': 'User logged in successfully',
-        'access_token': access_token,
-        'refresh_token': refresh_token
-        }), 200
 
 @version2.route('/refresh_token/', methods=['POST'])
 @jwt_refresh_token_required
@@ -104,33 +112,36 @@ def refresh_token():
     return jsonify({'status': 200, 'message': 'Token refreshed successfully', 'access_token': access_token})
 
 
-
-@version2.route('/logout/', methods=['DELETE'])
+@version2.route('/auth/logout/', methods=['POST'])
 @jwt_required
 def logout():
     """ Logout user """
     jti = get_raw_jwt()['jti']
-    RevokedTokenModel().add(jti)
+    RevokedTokenModel().save(jti)
     return jsonify({'status': 200, 'message': 'Logged out successfully'}), 200
+
+@version2.route('/profile/<int:user_id>/', methods=['GET'])
+def get_user_profile(user_id):
+    """ Get user profile."""
+      
+    if not UserModel().exists('id', user_id):
+        abort(make_response(jsonify({'status': 404, 'message': 'User not found'}), 404))
+
+    else:
+        user = UserModel().getOne(user_id)
+        result = UserSchema().dump(user) 
+        return jsonify({
+            'status': 200,
+            'data': result
+             })   
+
+
+
     
 
-# Endpoint for revoking the current users access token
-# @version1.route('/logout', methods=['DELETE'])
-# @jwt_required
-# def logout():
-#     jti = get_raw_jwt()['jti']
-#     blacklist.add(jti)
-#     return jsonify({"msg": "Successfully logged out"}), 200    
 
 
-'''
 
-@version2.route('/protected', methods=['GET'])
-@jwt_required
-def protected():
-    username = get_jwt_identity()
-    return jsonify(logged_in_as=username), 200       
-'''
 
 
 
