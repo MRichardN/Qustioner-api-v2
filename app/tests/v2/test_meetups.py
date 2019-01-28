@@ -56,11 +56,7 @@ class TestMeetup(BaseTest):
 
         self.assertEqual(res.status_code, 400)
         self.assertEqual(data['status'], 400)
-<<<<<<< HEAD
         self.assertEqual(data['message'], 'No data provided')
-=======
-        self.assertEqual(data['error'], 'Failed: No data provided')
->>>>>>> 3d5bb255d63bf2cd9f014ada570d278871c9fa91
 
     def test_create_meetup_with_missing_fields(self):
         """ Test create meetup with missing fields in request """
