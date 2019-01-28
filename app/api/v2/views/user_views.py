@@ -1,4 +1,4 @@
-# Third party import
+0# Third party import
 from flask import jsonify, request, abort, make_response
 from marshmallow import ValidationError
 from flask_jwt_extended import (create_access_token, create_refresh_token, jwt_required,
@@ -44,16 +44,16 @@ def register_user():
                 refresh_token = create_refresh_token(identity=new_user['id'])
                 return jsonify({
                     'status': 201, 
-                    'message' : 'New user created ', 
+                    'message' : 'New user created', 
                     'data': result, 
                     'access_token' : access_token, 
                     'refresh_token' : refresh_token
                     }), 201
             #display errors and valid data entered          
-        except ValidationError as errors:
-            errors.messages
-            valid_data = errors.valid_data
-            abort(make_response(jsonify({'status': 400, 'message' : 'Invalid data', 'errors': errors.messages, 'valid_data':valid_data}), 400))    
+        except ValidationError as error:
+            error.messages
+            valid_data = error.valid_data
+            abort(make_response(jsonify({'status': 400, 'message' : 'Invalid data', 'errors': error.messages, 'valid_data':valid_data}), 400))    
 
 @version2.route('/auth/login/', methods=['POST'])
 def login():
@@ -84,24 +84,23 @@ def login():
                         abort(make_response(jsonify({'status': 422, 'message' : 'Invalid password'}), 422))
 
                     else:
-                          # Generate user tokens 
-                          access_token = create_access_token(identity=user['id'])
-                          refresh_token = create_refresh_token(identity=True)
-                          return jsonify({
-                              'status': 200, 
-                              'message': 'User logged in successfully',
-                              'access_token': access_token,
-                              'refresh_token': refresh_token,
-                              'user_id': user['id']
-                              }), 200
+                        # Generate user tokens 
+                        access_token = create_access_token(identity=user['id'])
+                        refresh_token = create_refresh_token(identity=True)
+                        return jsonify({
+                            'status': 200, 
+                            'message': 'User logged in successfully',
+                            'access_token': access_token,
+                            'refresh_token': refresh_token,
+                            'user_id': user['id']
+                            }), 200
 
             except:
                 abort(make_response(jsonify({'status': 400, 'message': 'Invalid credentials'}), 400))
 
         except ValidationError as error:
-            errors = error.messages
-            valid_data = errors.valid_data
-            abort(make_response(jsonify({'status': 400, 'message' : 'Invalid data', 'errors': errors.messages, 'valid_data':valid_data}), 400))        
+            #errors = error.messages
+            abort(make_response(jsonify({'status': 400, 'message' : 'Invalid data', 'errors': error}), 400))        
     
 
 @version2.route('/refresh_token/', methods=['POST'])

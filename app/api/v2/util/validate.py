@@ -5,20 +5,44 @@ from datetime import datetime
 from marshmallow import ValidationError
 
 
-def password(pwd):
-    """ check password meets requirements."""
-    if len(pwd) not in range(6, 13):
-        raise ValidationError('password must be between 6 and 12 characters')
+# def password(pwd):
+#     """ check password meets requirements."""
+#     if len(pwd) not in range(6, 21):
+#         raise ValidationError('password must be between 6 and 12 characters')
 
-    if not re.search('[a-z]',pwd):
-        raise ValidationError('password must atleast have a lower case character')
+#     if not re.search('[a-z]', pwd):
+#         raise ValidationError('password must atleast have a lower case character')
 
-    if not re.search('[A-Z]', pwd):
-        raise ValidationError('password must contain an upper case letter') 
+#     if not re.search('[A-Z]', pwd):
+#         raise ValidationError('password must contain an upper case letter') 
 
-    if not re.search('[0-9]', pwd):
-        raise ValidationError('password must contain a numeric character') 
+#     if not re.search('[0-9]', pwd):
+#         raise ValidationError('password must contain a numeric character') 
+#     ###########added
+#     return pwd
 
+def password(password):
+    """ Validate password is Strong """
+
+    message = 'Invalid password'
+
+    if len(password) < 8:
+        raise ValidationError(message)
+
+    scores = {}
+
+    for letter in password:
+        if letter.islower():
+            scores['has_lower'] = 1
+
+        if letter.isupper():
+            scores['has_upper'] = 1
+
+        if letter.isdigit():
+            scores['has_digit'] = 1
+
+    if sum(scores.values()) < 3:
+        raise ValidationError(message)
 
 def email(value):
     """ check email format."""

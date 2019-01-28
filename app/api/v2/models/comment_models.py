@@ -26,3 +26,10 @@ class CommentModel(BaseModel):
         result = self.cur.fetchone()
         self.conn.commit()
         return result
+
+    def exist(self, key, value):
+        """ check whether it exists."""
+        query = "SELECT * FROM {} WHERE {} = '{}'".format(self.table, key, value)
+        self.cur.execute(query)
+        result = self.cur.fetchall()
+        return len(result) > 0    
