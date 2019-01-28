@@ -41,36 +41,6 @@ def post_comment():
 
 
 
-# @version2.route('/question/<int:question_id>/comments/', methods=['POST'])
-# @jwt_required
-# def post_comment(question_id):
-#     """ Post comment to a question."""
-
-#     comment_data = request.get_json()
-
-#     if not comment_data:
-#         abort(make_response(jsonify({'status':400, 'message': 'No data provided'}), 400))
-
-#     elif not QuestionModel().exist('id', question_id):
-#         abort(make_response(jsonify({'status':404, 'message': 'Question not found'}), 404))
-
-#     else:
-#         try:
-#             data = CommentSchema().load(comment_data)
-
-
-#             data['user_id'] = get_jwt_identity()
-#             data['question_id'] = question_id
-#             res = CommentModel().save(data)
-#             result = CommentSchema().dump(res)
-#             return jsonify({'status':201, 'message':'Comment posted', 'data':result}), 201
-
-#         except ValidationError as errors:
-#             errors.messages
-#             valid_data = errors.valid_data
-#             abort(make_response(jsonify({'status': 400, 'error' : 'Invalid data',\
-#             'errors': errors.messages, 'valid_data':valid_data}), 400))        
-
 
 @version2.route('/question/<int:question_id>/comments/', methods=['GET'])
 def get_comments(question_id):
