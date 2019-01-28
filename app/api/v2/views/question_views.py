@@ -13,10 +13,7 @@ from ..models.meetup_models import MeetupModel
 
 
 @version2.route('/question/', methods=["POST"])
-<<<<<<< HEAD
 @jwt_required
-=======
->>>>>>> 3d5bb255d63bf2cd9f014ada570d278871c9fa91
 def post_question():
     """ Post a question."""
     q_data = request.get_json()
@@ -37,7 +34,6 @@ def post_question():
                 data['user_id'] = get_jwt_identity()
                 question = QuestionModel().save(data)
                 result = QuestionSchema().dump(question)
-<<<<<<< HEAD
                 return jsonify({ 'status': 201, 'message': 'Question posted successfully', 'data':result}), 201
           
         # return errors alongside valid data
@@ -45,24 +41,11 @@ def post_question():
             #errors.messages
             valid_data = errors.valid_data
             abort(make_response(jsonify({'status': 400, 'message' : 'Invalid data.', 'errors': errors.messages, 'valid_data':valid_data}), 400)) 
-=======
-                return jsonify({ 'status': 201, 'message': 'Question posted', 'data':result}), 201
-          
-        # return errors alongside valid data
-        except ValidationError as errors:
-            errors.messages
-            valid_data = errors.valid_data
-            abort(make_response(jsonify({'status': 400, 'error' : 'Invalid data.', 'errors': errors.messages, 'valid_data':valid_data}), 400)) 
->>>>>>> 3d5bb255d63bf2cd9f014ada570d278871c9fa91
 
 
 @version2.route('/meetups/<int:meetup_id>/questions/', methods=['GET'])
 def get_meetup_questions(meetup_id):
-<<<<<<< HEAD
     """" Get all questions for a specific meetup."""
-=======
-    """" Get all questions."""
->>>>>>> 3d5bb255d63bf2cd9f014ada570d278871c9fa91
 
     if not MeetupModel().exists('id', meetup_id):
         abort(make_response(jsonify({'status':404, 'message': 'Meetup not found'}), 404))
@@ -100,11 +83,7 @@ def downvote_question(question_id):
                 'question_id':question_id,
                 'vote':'downvote'
             })
-<<<<<<< HEAD
             return jsonify({'status': 200, 'message': 'Question down-voted', 'data': result}), 200
-=======
-            return jsonify({'status': 200, 'message': 'Quesion down-voted', 'data': result}), 200
->>>>>>> 3d5bb255d63bf2cd9f014ada570d278871c9fa91
 
     
 
@@ -133,11 +112,7 @@ def upvote_question(question_id):
                 'question_id': question_id,
                 'vote':'upvote'
             })
-<<<<<<< HEAD
             return jsonify({'status': 200, 'message': 'Question up-voted', 'data': result}), 200
-=======
-            return jsonify({'status': 200, 'message': 'Quesion up-voted', 'data': result}), 200
->>>>>>> 3d5bb255d63bf2cd9f014ada570d278871c9fa91
             
 
 

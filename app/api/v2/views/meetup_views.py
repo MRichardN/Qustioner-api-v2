@@ -46,7 +46,6 @@ def post_meetups():
         else:
             try:    
                 # Check if request is valid
-<<<<<<< HEAD
                 data = MeetupSchema().load(meetup_data)
                 duplicate, message = MeetupModel().check_if_duplicate(data)
 
@@ -57,28 +56,12 @@ def post_meetups():
                     new_meetup = MeetupModel().save(data)
                     result = MeetupSchema().dump(new_meetup) 
                     return jsonify({'status': 201, 'message': 'Meetup created', 'data': result}), 201   
-=======
-                 data = MeetupSchema().load(meetup_data)
-                 duplicate, message = MeetupModel().check_if_duplicate(data)
-
-                 if duplicate:
-                     abort(make_response(jsonify({'status':403, 'message':message}), 403))
-
-                 else:
-                     new_meetup = MeetupModel().save(data)
-                     result = MeetupSchema().dump(new_meetup) 
-                     return jsonify({'status': 201, 'message': 'Meetup created', 'data': result}), 201   
->>>>>>> 3d5bb255d63bf2cd9f014ada570d278871c9fa91
         
             # display errors alongside valid data entered
             except ValidationError as errors:
                 errors.messages
                 valid_data = errors.valid_data
-<<<<<<< HEAD
                 abort(make_response(jsonify({'status': 400, 'message' : 'Invalid data', 'errors': errors.messages, 'valid_data':valid_data}), 400))    
-=======
-                abort(make_response(jsonify({'status': 400, 'error' : 'Invalid data', 'errors': errors.messages, 'valid_data':valid_data}), 400))    
->>>>>>> 3d5bb255d63bf2cd9f014ada570d278871c9fa91
 
     
  
