@@ -1,8 +1,10 @@
-0# Third party import
+# Third party import
+import datetime
 from flask import jsonify, request, abort, make_response
 from marshmallow import ValidationError
+
 from flask_jwt_extended import (create_access_token, create_refresh_token, jwt_required,
-                             get_jwt_identity, jwt_refresh_token_required, get_raw_jwt, JWTManager)
+                                get_jwt_identity, jwt_refresh_token_required, get_raw_jwt, JWTManager)
 
 # local import
 from app.api.v2 import version2
@@ -16,6 +18,7 @@ from ..schemas.user_schemas import UserSchema
 def register_user():
     """ Register user endpoint."""
     reg_data = request.get_json()
+    print('######## reg data: /auth/register/  #######', reg_data)
 
     
     # Empty entry
@@ -26,6 +29,7 @@ def register_user():
         try:            
             # Check if request is valid
             data = UserSchema().load(reg_data)
+            print('############## data: UserSchema:#######', data)
         
             # Check if username exists
             if UserModel().exists('username', data['username']):
@@ -38,9 +42,10 @@ def register_user():
             else:
                 # Save new user 
                 new_user = UserModel().save(data)
+                print('#############new_user############',new_user)
                 result = UserSchema(exclude=['password']).dump(new_user)
                 # Generate access and refresh tokens
-                access_token = create_access_token(identity=new_user['id'], fresh=True)
+                access_token = create_access_token(identity=new_user['id'])
                 refresh_token = create_refresh_token(identity=new_user['id'])
                 return jsonify({
                     'status': 201, 
@@ -85,7 +90,8 @@ def login():
 
                     else:
                         # Generate user tokens 
-                        access_token = create_access_token(identity=user['id'])
+                        expires = datetime.timedelta(days=10)
+                        access_token = create_access_token(identity=user['id'], expires_delta=expires)
                         refresh_token = create_refresh_token(identity=True)
                         return jsonify({
                             'status': 200, 
@@ -109,7 +115,7 @@ def refresh_token():
     """ Refresh user token."""
     current_user = get_jwt_identity()
     access_token = create_access_token(identity=current_user)
-    return jsonify({'status': 200, 'message': 'Token refreshed successfully', 'access_token': access_token})
+    return jsonify({'status': 200, 'message': 'Token refreshed successfully', 'access_token': access_token, 'current_user':current_user })
 
 
 @version2.route('/auth/logout/', methods=['POST'])

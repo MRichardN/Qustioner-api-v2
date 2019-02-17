@@ -21,29 +21,32 @@ class UserModel(BaseModel):
         query = "INSERT INTO {} (firstname, lastname, username, email, password)\
         VALUES('{}', '{}', '{}', '{}', '{}') RETURNING *".format(self.table, data['firstname'],
         data['lastname'], data['username'], data['email'], generate_password_hash(data['password']))
-        self.cur.execute(query)
-        result = self.cur.fetchone()
-        self.conn.commit()
-        return result
+        return self.insert(query)
 
     def exists(self, key, value):
         """ Check if user exists."""
         query = "SELECT * from {} WHERE {} = '{}'".format(self.table, key, value)    
-        self.cur.execute(query)
-        result = self.cur.fetchall()
+        result = self.fetchAll(query)
         return len(result) > 0
 
     def where(self, key, value):
         """ Fetch user."""
         query = "SELECT * FROM {} WHERE {} = '{}'".format(self.table, key, value)
-        self.cur.execute(query)
-        result = self.cur.fetchone()
-        return result  
+        return self.fetchOne(query) 
+
+    # def isAdmin(self, user_id):
+    #     user = self.where('isAdmin', user_id) 
+    #     return user['id']
+
+    def isAdmin(self, user_id):
+        user = self.where('id', user_id)
+        return user['isadmin']    
 
        
-    def isAdmin(self, user_id):
-        user = self.where('id', user_id) 
-        return user['email']   
+    # def isAdmin(self, user_id):
+    #     user = self.where('id', user_id) 
+    #     print('########isAdmin##### at usermodels#####',user)
+    #     return user['isAdmin']
 
     def getOne(self, id):
         """ Get user profile."""
@@ -51,20 +54,17 @@ class UserModel(BaseModel):
         questions_query = "SELECT COUNT(DISTINCT id)\
         FROM questions WHERE user_id = '{}'".format(id)
 
-        self.cur.execute(questions_query)
-        questions_asked = self.cur.fetchone()
+        questions_asked = self.fetchOne(questions_query)
 
         comments_query = "SELECT COUNT(DISTINCT question_id)\
         FROM comments WHERE user_id = '{}'".format(id)
 
-        self.cur.execute(comments_query)
-        questions_commented = self.cur.fetchone()
+        questions_commented = self.fetchOne(comments_query)
 
         query = "SELECT users.id, users.firstname, users.lastname, users.username\
         FROM users WHERE id = '{}'".format(id)
 
-        self.cur.execute(query)
-        result = self.cur.fetchone()
+        result = self.fetchOne(query)
 
         result.update({
             'questions_asked': questions_asked['count'],
@@ -72,12 +72,7 @@ class UserModel(BaseModel):
             })
         return result    
 
-    def delete(self, id):
-        pass
-
-    def all(self):
-        pass
-
+   
 
 
 

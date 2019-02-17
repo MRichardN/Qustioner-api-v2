@@ -44,7 +44,7 @@ def post_meetups():
             abort(make_response(jsonify({'status': 400, 'message': 'No data provided'}), 400))
        
         else:
-            try:    
+            try:
                 # Check if request is valid
                 data = MeetupSchema().load(meetup_data)
                 duplicate, message = MeetupModel().check_if_duplicate(data)
@@ -54,7 +54,9 @@ def post_meetups():
 
                 else:
                     new_meetup = MeetupModel().save(data)
+                    print('## new-meetup in meetup view::', new_meetup)
                     result = MeetupSchema().dump(new_meetup) 
+                    print('## result in meetup view::', result)
                     return jsonify({'status': 201, 'message': 'Meetup created', 'data': result}), 201   
         
             # display errors alongside valid data entered
@@ -88,7 +90,7 @@ def get_a_specific_meetup(meetup_id):
 def rspvs_meetup(meetup_id, rsvps):
     """ rsvp meetup."""
 
-    response = ('yes', 'no', 'maybe')
+    response = ('yes', 'Yes', 'YES', 'no', 'No', 'NO', 'maybe', 'Maybe', 'MAYBE')
 
     current_user = get_jwt_identity()
         
@@ -117,7 +119,7 @@ def delete_meetup(meetup_id):
     current_user = get_jwt_identity()
 
     if not UserModel().isAdmin(current_user):
-        abort(make_response(jsonify({'status':401, 'message': 'Unauthorized'}),401))
+        abort(make_response(jsonify({'status':401, 'message': 'Unauthorized'}), 401))
             
     else:
         if not MeetupModel().exists('id', meetup_id):

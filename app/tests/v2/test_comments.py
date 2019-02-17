@@ -22,8 +22,7 @@ class TestComments(BaseTest):
         }
 
         self.comment1 = {
-            'body': 'Why cant we use an ORM like SQLAlchemy',
-            'question_id': 1
+            'body': 'Why cant we use an ORM like SQLAlchemy'
         }
 
         self.comment2 = {
@@ -39,13 +38,30 @@ class TestComments(BaseTest):
 ###########failed not found
     def test_post_comment(self):
         """ Test post a comment."""
+        print('######self.quiz', self.question)
         
-        res = self.client.post('/api/v2/comment/', json=self.comment1, headers=self.headers)
+        res = self.client.post('/api/v2/question/1/comments/', json=self.comment1, headers=self.headers)
         data = res.get_json()
+        print('####### post data', data)
 
         self.assertEqual(res.status_code, 201)
         self.assertEqual(data['status'], 201)
         self.assertEqual(data['message'], 'Comment posted')
+
+
+    def test_getAll_comments(self):
+        """ Test get all comments for a specific question."""
+        self.client.post('/api/v2/question/1/comments/', json=self.comment1,
+                         headers=self.headers)
+        self.client.post('/api/v2/question/1/comments/', json=self.comment2,
+                         headers=self.headers)
+
+        res = self.client.get('/api/v2/question/1/comments/')
+        data = res.get_json()
+
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(data['status'], 200)
+        self.assertEqual(len(data['data']), 2)
 '''
     ###########failed not found
     def test_post_comment_for__no_data_sent(self):
@@ -95,19 +111,6 @@ class TestComments(BaseTest):
         self.assertEqual(data['status'], 404)
         self.assertEqual(data['message'], 'Question not found')
 
-    def test_getAll_comments(self):
-        """ Test get all comments for a specific question."""
-        self.client.post('/api/v2/question/comments/', json=self.comment1,
-                         headers=self.headers)
-        self.client.post('/api/v2/question/1/comments/', json=self.comment2,
-                         headers=self.headers)
-
-        res = self.client.get('/api/v2/question/1/comments/')
-        data = res.get_json()
-
-        self.assertEqual(res.status_code, 200)
-        self.assertEqual(data['status'], 200)
-        self.assertEqual(len(data['data']), 2)
 
     ###########failed not found
     def test_getAll_comments_for_question_without_comment(self):

@@ -1,4 +1,3 @@
-import json
 from .base_test import BaseTest
 
 
@@ -10,7 +9,7 @@ class TestQuestion(BaseTest):
 
         self.meetup = {
             'topic': 'TDD',
-            'description': 'SOftware development the TDD way is very crucial',
+            'description': 'Software development the TDD way is very crucial',
             'location': 'Moringa School',
             'happeningOn': '27/01/2019',
             'tags': ['Python', 'Tests']
@@ -28,8 +27,9 @@ class TestQuestion(BaseTest):
             'meetup_id': 1,
         }
 
-        self.client.post('/api/v2/meetup/', json=self.meetup,
-                         headers=self.headers)
+        test = self.client.post('/api/v2/meetup/', json=self.meetup, headers=self.headers)
+
+        print('### test-post meetup::', test)
 
     def tearDown(self):
         super().tearDown()
@@ -37,7 +37,7 @@ class TestQuestion(BaseTest):
     def test_post_question_meetup_not_created(self):
         """ Test post question to meetup that doesn't exist """
 
-        self.question1.update({'meetup_id': 15})
+        self.question1.update({'meetup_id': 115})
 
         res = self.client.post('/api/v2/question/', json=self.question1,
                                headers=self.headers)
@@ -81,7 +81,7 @@ class TestQuestion(BaseTest):
 
         self.assertEqual(res.status_code, 400)
         self.assertEqual(data['status'], 400)
-        self.assertEqual(data['message'], 'No data sent')
+        self.assertEqual(data['message'], 'No data provided')
 
     def test_post_question_missing_fields(self):
         """ Test post question with missing fields in data sent """
@@ -156,19 +156,15 @@ class TestQuestion(BaseTest):
     def test_upvote_question(self):
         """ Test upvote question successfully """
 
-        self.client.post('/api/v2/question/', json=self.question1,
-                         headers=self.headers)
+        self.client.post('/api/v2/question/', json=self.question1, headers=self.headers)
 
-        res = self.client.patch('/api/v2/question/1/upvote/',
-                                headers=self.headers)
+        res = self.client.patch('/api/v2/question/1/upvote/', headers=self.headers)
         data = res.get_json()
 
         self.assertEqual(res.status_code, 200)
         self.assertEqual(data['status'], 200)
         self.assertEqual(data['message'], 'Question up-voted')
-        self.assertEqual(data['data']['votes'], 1)
-
-                       
+        self.assertEqual(data['data']['votes'], 1)                    
 
     def test_downvote_question_not_posted(self):
         """ Test downvote for question that hasn't been posted """

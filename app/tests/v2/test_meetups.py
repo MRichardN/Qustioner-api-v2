@@ -125,7 +125,7 @@ class TestMeetup(BaseTest):
 
         self.assertEqual(res.status_code, 401)
         self.assertEqual(data['status'], 401)
-        self.assertEqual(data['error'], 'Only authorized users')
+        self.assertEqual(data['message'], 'You are not authorized')
 
     ##################
     def test_getAll_meetups_no_data(self):
@@ -277,7 +277,7 @@ class TestMeetup(BaseTest):
         res = self.client.post('/api/v2/meetups/1/yes/', headers=self.headers)
         data = res.get_json()
 
-        print('################Check {}'.format(data))
+        print('################Check in test rsvps , line 280:: {}'.format(data))
 
         self.assertEqual(res.status_code, 200)
         self.assertEqual(data['status'], 200)

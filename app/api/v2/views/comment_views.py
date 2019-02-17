@@ -9,9 +9,9 @@ from ..models.question_models import QuestionModel
 
 
 
-@version2.route('/comment/', methods=["POST"])
+@version2.route('/question/<int:question_id>/comments/', methods=['POST'])
 @jwt_required
-def post_comment():
+def post_comment(question_id):
     """ Post a question."""
     c_data = request.get_json()
 
@@ -24,14 +24,18 @@ def post_comment():
         try:
             data = CommentSchema().load(c_data)
 
-            if not CommentModel().exist('id', data['question_id']):
-                abort(make_response(jsonify({'status': 404, 'message': 'Meetup not found'}), 404))
+            if not QuestionModel().exist('id', question_id):
+                abort(make_response(jsonify({'status': 404, 'message': 'Question not found'}), 404))
+
+            elif CommentModel().check_duplicate(question_id, data['body']):
+                abort(make_response(jsonify({'status':409, 'message':'This comment has already been posted'}), 409))    
 
             else:
                 data['user_id'] = get_jwt_identity()
+                data['question_id'] = question_id
                 comment = CommentModel().save(data)
                 result = CommentSchema().dump(comment)
-                return jsonify({ 'status': 201, 'message': 'Question posted successfully', 'data':result}), 201
+                return jsonify({'status': 201, 'message': 'Comment posted successfully', 'data':result}), 201
           
         # return errors alongside valid data
         except ValidationError as errors:

@@ -29,7 +29,7 @@ class DevelopmentConfig(Config):
 class TestingConfig(Config):
     """Configurations for Testing; with a separate test database."""
     TESTING = True
-    DATABASSE_NAME = os.getenv('TEST_DB')
+    DATABASE_NAME = os.getenv('TEST_DB')
 
 
 class StagingConfig(Config):
