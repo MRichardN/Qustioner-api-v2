@@ -3,7 +3,7 @@
 [![Coverage Status](https://coveralls.io/repos/github/MRichardN/Questioner-api/badge.svg?branch=develop)](https://coveralls.io/github/MRichardN/Questioner-api?branch=develop)
 [![Maintainability](https://api.codeclimate.com/v1/badges/c72f85d70a879602dc6c/maintainability)](https://codeclimate.com/github/MRichardN/Questioner-api/maintainability)
 
-A questioner is a platform for crowd-sourcing questions for a meetup. It helps the meetup organizer prioritize  questions to be answered. Other users can vote on asked questions and they bubble to the top  or bottom of the log.
+Questioner is a platform for crowd-sourcing questions for a meetup. It helps the meetup organizer prioritize  questions to be answered. Other users can vote on asked questions and they bubble to the top  or bottom of the log.
 
 ## Prerequisites
 - Python 3.7.0 
